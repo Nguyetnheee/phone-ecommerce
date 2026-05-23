@@ -22,7 +22,7 @@ function Navbar() {
           <Link to="/" className="hover:text-blue-600">
             Trang chủ
           </Link>
-          <Link to="/" className="hover:text-blue-600">
+          <Link to="/products" className="hover:text-blue-600">
             Sản phẩm
           </Link>
           <Link to="/" className="hover:text-blue-600">
