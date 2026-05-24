@@ -10,7 +10,7 @@ function Navbar() {
           </Link>
           <div className="flex items-center gap-3 text-sm font-medium text-slate-700 lg:hidden">
             <Link to="/">Giỏ hàng</Link>
-            <Link to="/">Tài khoản</Link>
+            <Link to="/login">Tài khoản</Link>
           </div>
         </div>
 
@@ -31,7 +31,7 @@ function Navbar() {
           <Link to="/" className="hidden hover:text-blue-600 lg:inline">
             Giỏ hàng
           </Link>
-          <Link to="/" className="hidden hover:text-blue-600 lg:inline">
+          <Link to="/login" className="hidden hover:text-blue-600 lg:inline">
             Tài khoản
           </Link>
         </nav>
