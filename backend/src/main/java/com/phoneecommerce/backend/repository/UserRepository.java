@@ -1,12 +1,14 @@
 package com.phoneecommerce.backend.repository;
 
-import com.phoneecommerce.backend.entity.User;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.phoneecommerce.backend.entity.User;
 
 
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
     Optional<User> findUserByEmail(String email);
