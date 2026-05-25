@@ -1,5 +1,6 @@
 package com.phoneecommerce.backend.dto.request;
 
+import com.phoneecommerce.backend.enums.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -22,5 +23,4 @@ public class RegisterRequest {
     @NotBlank(message = "Password không được để trống")
     @Size(min = 5, message = "Mật khẩu phải bao gồm ít nhất 5 ký tự")
     private String password;
-
 }

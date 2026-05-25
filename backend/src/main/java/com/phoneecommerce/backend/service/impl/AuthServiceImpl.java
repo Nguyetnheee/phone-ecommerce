@@ -14,9 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
-import java.time.LocalDate;
-
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -53,13 +50,15 @@ public class AuthServiceImpl implements AuthService {
         }
         User users = User.builder()
                 .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .fullname(registerRequest.getFullname())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(UserRole.USER)
                 .build();
         User saveUser = userRepo.save(users);
         return new RegisterResponse(
-
+                saveUser.getEmail(),
+                saveUser.getFullname(),
+                "Thành công"
         );
     }
 }
