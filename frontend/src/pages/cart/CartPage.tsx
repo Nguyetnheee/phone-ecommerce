@@ -225,13 +225,11 @@ function CartPage() {
               </div>
 
               {/* Checkout Button */}
-              <button
-                disabled
-                className="mt-6 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-semibold text-white bg-slate-400 cursor-not-allowed opacity-60"
-                title="Checkout sẽ được thêm khi BE-013 sẵn sàng"
-              >
-                Thanh toán (Sắp có)
-              </button>
+              <div className="mt-6">
+                <Link to="/checkout">
+                  <Button type="button">Thanh toán</Button>
+                </Link>
+              </div>
 
               {/* Info Text */}
               <p className="mt-4 text-xs text-slate-500 text-center">

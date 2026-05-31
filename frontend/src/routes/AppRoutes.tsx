@@ -5,6 +5,8 @@ import ProductListPage from '../pages/products/ProductListPage';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import CartPage from '../pages/cart/CartPage';
+import CheckoutPage from '../pages/checkout/CheckoutPage';
+import OrderSuccessPage from '../pages/checkout/OrderSuccessPage';
 
 function AppRoutes() {
   return (
@@ -30,6 +32,22 @@ function AppRoutes() {
         element={
           <MainLayout>
             <CartPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <MainLayout>
+            <CheckoutPage />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/order-success"
+        element={
+          <MainLayout>
+            <OrderSuccessPage />
           </MainLayout>
         }
       />
