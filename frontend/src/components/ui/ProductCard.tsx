@@ -1,4 +1,5 @@
 import type { Product } from '../../types/Product';
+import { useCartContext } from '../../context/CartContext';
 import Button from './Button';
 
 interface ProductCardProps {
@@ -11,6 +12,14 @@ const currencyFormatter = new Intl.NumberFormat('vi-VN', {
 });
 
 function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCartContext();
+
+  const handleAddToCart = () => {
+    console.log('[ProductCard] Adding to cart:', product);
+    addItem(product);
+    console.log('[ProductCard] Item added to cart');
+  };
+
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
       <div className="relative aspect-square bg-slate-100">
@@ -39,7 +48,7 @@ function ProductCard({ product }: ProductCardProps) {
         <p className="mt-2 text-sm text-slate-600">
           {product.storage} {product.ram ? `- RAM ${product.ram}` : ''}
         </p>
-        <Button type="button" className="mt-4 w-full">
+        <Button type="button" className="mt-4 w-full" onClick={handleAddToCart}>
           Thêm vào giỏ
         </Button>
       </div>
