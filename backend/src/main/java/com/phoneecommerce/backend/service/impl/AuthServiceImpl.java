@@ -61,9 +61,11 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         User saveUser = userRepo.save(users);
         return new RegisterResponse(
-                saveUser.getEmail(),
+
                 saveUser.getFullname(),
-                "Thành công"
+                "Thành công",
+                saveUser.getEmail()
+
         );
     }
 }
