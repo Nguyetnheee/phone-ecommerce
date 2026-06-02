@@ -160,7 +160,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        fullName: payload.name, // Map frontend 'name' to backend 'fullName'
+        fullname: payload.name, // Map frontend 'name' to backend 'fullname' (all lowercase)
         email: payload.email,
         password: payload.password,
         // Do NOT send confirmPassword to backend
