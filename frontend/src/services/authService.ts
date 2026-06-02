@@ -22,11 +22,10 @@ export interface RegisterPayload {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  token?: string;
+  token?: string | null;
   user?: {
-    id?: number;
     email?: string;
-    fullName?: string;
+    role?: string;
   };
 }
 
@@ -37,16 +36,7 @@ const API_BASE = 'http://localhost:8080/api/auth';
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
 
-/**
- * Store authentication token
- */
-function storeToken(token: string): void {
-  try {
-    localStorage.setItem(TOKEN_KEY, token);
-  } catch (error) {
-    console.error('[Auth] Error storing token:', error);
-  }
-}
+
 
 /**
  * Get stored authentication token
@@ -63,7 +53,7 @@ export function getToken(): string | null {
 /**
  * Store user data
  */
-function storeUser(user: { id?: number; email?: string; fullName?: string }): void {
+function storeUser(user: { email: string; role: string }): void {
   try {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error) {
@@ -74,7 +64,7 @@ function storeUser(user: { id?: number; email?: string; fullName?: string }): vo
 /**
  * Get stored user data
  */
-export function getUser(): { id?: number; email?: string; fullName?: string } | null {
+export function getUser(): { email: string; role: string } | null {
   try {
     const user = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
@@ -88,10 +78,11 @@ export function getUser(): { id?: number; email?: string; fullName?: string } | 
  * Login function
  * 
  * Calls POST /api/auth/login with email and password
+ * Backend returns: { email, token: null, role }
  */
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   try {
-    console.log('[Auth] Login attempt with email:', payload.email);
+    console.log('[Auth] Login attempt');
 
     const response = await fetch(`${API_BASE}/login`, {
       method: 'POST',
@@ -107,7 +98,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
     const data = await response.json();
 
     if (!response.ok) {
-      console.warn('[Auth] Login failed:', data);
+      console.warn('[Auth] Login failed');
       return {
         success: false,
         message: data.message || 'Login failed. Please check your email and password.',
@@ -116,26 +107,19 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 
     console.log('[Auth] Login successful');
 
-    // Store token if provided
-    if (data.token) {
-      storeToken(data.token);
-      console.log('[Auth] Token stored');
-    }
-
-    // Store user if provided
-    if (data.user) {
-      storeUser(data.user);
-      console.log('[Auth] User data stored');
+    // Store minimal user info (email and role)
+    if (data.email && data.role) {
+      storeUser({ email: data.email, role: data.role });
     }
 
     return {
       success: true,
       message: data.message || 'Login successful',
       token: data.token,
-      user: data.user,
+      user: { email: data.email, role: data.role },
     };
   } catch (error) {
-    console.error('[Auth] Login error:', error);
+    console.error('[Auth] Login error');
     return {
       success: false,
       message: 'Network error. Please check your connection.',
@@ -152,7 +136,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
  */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
   try {
-    console.log('[Auth] Register attempt with email:', payload.email);
+    console.log('[Auth] Register attempt');
 
     const response = await fetch(`${API_BASE}/register`, {
       method: 'POST',
@@ -170,7 +154,7 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
     const data = await response.json();
 
     if (!response.ok) {
-      console.warn('[Auth] Register failed:', data);
+      console.warn('[Auth] Register failed');
       return {
         success: false,
         message: data.message || 'Registration failed. Please try again.',
