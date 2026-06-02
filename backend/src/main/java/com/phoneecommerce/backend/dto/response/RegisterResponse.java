@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterResponse {
-
+    private String fullname;
     private String message;
     private String email;
-    private String validationEmailContent;
-
 }

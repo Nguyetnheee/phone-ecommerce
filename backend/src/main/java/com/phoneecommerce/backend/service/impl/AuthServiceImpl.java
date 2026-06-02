@@ -1,5 +1,6 @@
 package com.phoneecommerce.backend.service.impl;
 
+import com.phoneecommerce.backend.config.JwtService;
 import com.phoneecommerce.backend.dto.request.LoginRequest;
 import com.phoneecommerce.backend.dto.request.RegisterRequest;
 import com.phoneecommerce.backend.dto.response.LoginResponse;
@@ -23,6 +24,9 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    JwtService jwtService;
+
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         User user = userRepo.findUserByEmail(loginRequest.getEmail())
@@ -32,10 +36,11 @@ public class AuthServiceImpl implements AuthService {
         if(!ok){
             throw  new AppException(HttpStatus.UNAUTHORIZED,"Email hoặc mật khẩu sai");
         }
-
+        String token = jwtService.generateToken(user);
         return LoginResponse.builder()
                 .email(user.getEmail())
                 .role(user.getRole())
+                .token(token)
                 .build();
     }
 
@@ -56,9 +61,11 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         User saveUser = userRepo.save(users);
         return new RegisterResponse(
-                saveUser.getEmail(),
+
                 saveUser.getFullname(),
-                "Thành công"
+                "Thành công",
+                saveUser.getEmail()
+
         );
     }
 }
