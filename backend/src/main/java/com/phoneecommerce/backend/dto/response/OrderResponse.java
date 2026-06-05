@@ -4,7 +4,7 @@ import com.phoneecommerce.backend.entity.CartItem;
 
 import java.util.List;
 
-public class CartResponse {
+public class OrderResponse {
     private String receiver_name;
 
     private String phone;

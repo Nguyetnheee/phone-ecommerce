@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartRequest {
+public class OrderRequest {
     private String receiver_name;
 
     @Pattern(regexp = "^[0-9]{10,}$", message = "Số điện thoại phải chỉ chứa số và có ít nhất 10 chữ số")
