@@ -13,13 +13,22 @@ import java.util.UUID;
 @Builder
 public class CartItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Product_id")
-    private Product item;
+    private Product item_id;
 
-    @Column (name = "Quantity")
-    private int quantity;
+    private String name;
+
+    private String brand;
+
+    private double price;
+
+    private String storage;
+
+    private String ram;
+
+    private Integer quantity;
 }

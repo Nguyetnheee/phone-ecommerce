@@ -9,33 +9,31 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name= "order")
 @Data
+@Table(name= "Orders")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "User_id", unique = true)
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user_id;
 
-    @Column(name = "Status")
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    @Column(name = "Receiver")
     private String name;
 
-    @Column(name = "Address")
     private String address;
 
-    @Column(name = "Phone")
-    private String number;
+    private String phone_number;
 
-    @OneToMany(mappedBy = "cart_id", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CartItem> orderItems = new ArrayList<>();
+    @OneToMany(mappedBy = "id",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<CartItem> items = new ArrayList<>();
 }
