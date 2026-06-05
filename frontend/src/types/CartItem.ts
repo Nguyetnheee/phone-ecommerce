@@ -11,6 +11,7 @@ export interface CartItem {
   quantity: number;
   storage?: string;
   ram?: string;
+  stock: number;
 }
 
 /**

@@ -50,6 +50,7 @@ export function useCart(): UseCartReturn {
   /**
    * Add product to cart
    * If product already exists, increase quantity
+   * Checks if stock is available
    */
   const addItem = useCallback((product: Product) => {
     console.log('[useCart] addItem called with product:', product);
@@ -58,7 +59,11 @@ export function useCart(): UseCartReturn {
       const existingItem = prevItems.find((item) => item.productId === product.id);
 
       if (existingItem) {
-        // Product exists - increase quantity
+        // Product exists - check if can increase quantity
+        if (existingItem.quantity >= product.stock) {
+          console.log('[useCart] Cannot add more - stock limit reached:', product.stock);
+          return prevItems; // Don't add if already at stock limit
+        }
         console.log('[useCart] Product exists, increasing quantity from', existingItem.quantity);
         return prevItems.map((item) =>
           item.productId === product.id
@@ -67,7 +72,13 @@ export function useCart(): UseCartReturn {
         );
       }
 
-      // Product doesn't exist - add as new item
+      // Product doesn't exist - check if stock is available
+      if (product.stock <= 0) {
+        console.log('[useCart] Cannot add - product out of stock');
+        return prevItems; // Don't add if out of stock
+      }
+
+      // Add as new item
       console.log('[useCart] Adding new item to cart');
       const newItem: CartItem = {
         productId: product.id,
@@ -78,6 +89,7 @@ export function useCart(): UseCartReturn {
         quantity: 1,
         storage: product.storage,
         ram: product.ram,
+        stock: product.stock,
       };
 
       return [...prevItems, newItem];
@@ -94,7 +106,7 @@ export function useCart(): UseCartReturn {
   /**
    * Update product quantity in cart
    * If quantity is 0 or less, remove the item
-   * Prevents invalid quantities
+   * Checks if quantity doesn't exceed available stock
    */
   const updateQuantity = useCallback((productId: number, quantity: number) => {
     if (quantity < 1) {
@@ -104,11 +116,17 @@ export function useCart(): UseCartReturn {
     }
 
     setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.productId === productId
-          ? { ...item, quantity }
-          : item
-      )
+      prevItems.map((item) => {
+        if (item.productId === productId) {
+          // Check if quantity exceeds stock
+          const newQuantity = Math.min(quantity, item.stock);
+          if (newQuantity < quantity) {
+            console.log('[useCart] Quantity capped at stock limit:', item.stock);
+          }
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
     );
   }, [removeItem]);
 

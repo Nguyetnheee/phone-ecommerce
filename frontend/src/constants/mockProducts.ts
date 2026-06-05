@@ -11,6 +11,7 @@ export const mockProducts: Product[] = [
     storage: '256GB',
     ram: '8GB',
     badge: 'Bán chạy',
+    stock: 10,
   },
   {
     id: 2,
@@ -22,6 +23,7 @@ export const mockProducts: Product[] = [
     storage: '256GB',
     ram: '12GB',
     badge: 'Mới',
+    stock: 5,
   },
   {
     id: 3,
@@ -32,6 +34,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=600&q=80',
     storage: '512GB',
     ram: '12GB',
+    stock: 15,
   },
   {
     id: 4,
@@ -42,5 +45,6 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?auto=format&fit=crop&w=600&q=80',
     storage: '256GB',
     ram: '8GB',
+    stock: 3,
   },
 ];

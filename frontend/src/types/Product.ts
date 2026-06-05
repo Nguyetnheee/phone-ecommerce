@@ -7,4 +7,5 @@ export interface Product {
   storage?: string;
   ram?: string;
   badge?: string;
+  stock: number;
 }
