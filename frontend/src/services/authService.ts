@@ -107,10 +107,8 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 
     console.log('[Auth] Login successful');
 
-    // Store minimal user info (email and role)
-    if (data.email && data.role) {
-      storeUser({ email: data.email, role: data.role });
-    }
+    storeUser({ email: data.email, role: data.role });
+    localStorage.setItem(TOKEN_KEY, data.token || '');
 
     return {
       success: true,
