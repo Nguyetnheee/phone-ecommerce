@@ -1,6 +1,6 @@
 package com.phoneecommerce.backend.mapper;
 
-import com.phoneecommerce.backend.dto.ProductResponse;
+import com.phoneecommerce.backend.dto.response.ProductResponse;
 import com.phoneecommerce.backend.entity.Product;
 
 public class ProductMapper {
