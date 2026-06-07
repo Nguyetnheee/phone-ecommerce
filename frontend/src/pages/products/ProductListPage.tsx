@@ -1,47 +1,51 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ProductCard from '../../components/ui/ProductCard';
-import { mockProducts } from '../../constants/mockProducts';
+import { getAllProducts } from '../../services/product.service';
 import type { Product } from '../../types/Product';
 
 function ProductListPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedBrand, setSelectedBrand] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100000000);
 
-  // Get unique brands from mockProducts
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const productList = await getAllProducts();
+        setProducts(productList);
+      } catch {
+        setErrorMessage('Unable to load products. Please check that the backend is running.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
   const brands = useMemo(() => {
-    const uniqueBrands = Array.from(new Set(mockProducts.map((p) => p.brand))).sort();
-    return uniqueBrands;
-  }, []);
+    const uniqueBrands = new Set(products.map((product) => product.brand));
+    return Array.from(uniqueBrands).sort();
+  }, [products]);
 
-  // Get min and max price from products
-  const priceRange = useMemo(() => {
-    if (mockProducts.length === 0) return { min: 0, max: 0 };
-    const prices = mockProducts.map((p) => p.price);
-    return {
-      min: Math.min(...prices),
-      max: Math.max(...prices),
-    };
-  }, []);
-
-  // Filter products based on search, brand, and price
   const filteredProducts = useMemo(() => {
-    return mockProducts.filter((product: Product) => {
-      // Search by name or brand (case-insensitive)
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return products.filter((product) => {
       const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+        product.name.toLowerCase().includes(normalizedSearch) ||
+        product.brand.toLowerCase().includes(normalizedSearch);
+      const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
 
-      // Filter by selected brand
-      const matchesBrand = selectedBrand === '' || product.brand === selectedBrand;
-
-      // Filter by price range
       const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
 
       return matchesSearch && matchesBrand && matchesPrice;
     });
-  }, [searchQuery, selectedBrand, minPrice, maxPrice]);
+  }, [products, searchTerm, selectedBrand, minPrice, maxPrice]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -68,8 +72,8 @@ function ProductListPage() {
                 id="search"
                 type="text"
                 placeholder="Tên sản phẩm hoặc thương hiệu"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="mt-3 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -85,7 +89,7 @@ function ProductListPage() {
                 onChange={(e) => setSelectedBrand(e.target.value)}
                 className="mt-3 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <option value="">Tất cả thương hiệu</option>
+                <option value="all">Tất cả thương hiệu</option>
                 {brands.map((brand) => (
                   <option key={brand} value={brand}>
                     {brand}
@@ -102,8 +106,6 @@ function ProductListPage() {
               <input
                 id="minPrice"
                 type="number"
-                min={priceRange.min}
-                max={priceRange.max}
                 value={minPrice}
                 onChange={(e) => setMinPrice(Number(e.target.value))}
                 className="mt-3 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -118,8 +120,6 @@ function ProductListPage() {
               <input
                 id="maxPrice"
                 type="number"
-                min={priceRange.min}
-                max={priceRange.max}
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="mt-3 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -131,7 +131,11 @@ function ProductListPage() {
 
       {/* Products Grid */}
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        {filteredProducts.length > 0 ? (
+        {isLoading ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+            Loading products...
+          </div>
+        ) : !errorMessage && filteredProducts.length > 0 ? (
           <div>
             <p className="mb-6 text-sm text-slate-600">
               Tìm thấy <span className="font-semibold">{filteredProducts.length}</span> sản phẩm
@@ -142,14 +146,22 @@ function ProductListPage() {
               ))}
             </div>
           </div>
-        ) : (
+        ) : !isLoading && !errorMessage && products.length === 0 ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+            No products are available yet.
+          </div>
+        ) : !isLoading && !errorMessage && filteredProducts.length === 0 ? (
           <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
             <p className="text-lg font-semibold text-slate-950">Không tìm thấy sản phẩm</p>
             <p className="mt-2 text-slate-600">
               Hãy thử thay đổi các tiêu chí tìm kiếm của bạn
             </p>
           </div>
-        )}
+        ) : !isLoading && errorMessage ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center text-red-700">
+            {errorMessage}
+          </div>
+        ) : null}
       </div>
     </div>
   );
