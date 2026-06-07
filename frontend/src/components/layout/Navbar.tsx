@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCartContext } from '../../context/CartContext';
 
 function Navbar() {
   const { isAuthenticated, logout } = useAuth();
+  const { totalItems } = useCartContext();
 
   const handleLogout = () => {
     logout();
@@ -17,7 +19,14 @@ function Navbar() {
             PhoneStore
           </Link>
           <div className="flex items-center gap-3 text-sm font-medium text-slate-700 lg:hidden">
-            <Link to="/">Giỏ hàng</Link>
+            <Link to="/cart" className="relative">
+              Giỏ hàng
+              {totalItems > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
@@ -45,8 +54,13 @@ function Navbar() {
           <Link to="/" className="hover:text-blue-600">
             Khuyến mãi
           </Link>
-          <Link to="/" className="hidden hover:text-blue-600 lg:inline">
+          <Link to="/cart" className="hidden hover:text-blue-600 lg:inline relative">
             Giỏ hàng
+            {totalItems > 0 && (
+              <span className="absolute -right-3 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                {totalItems}
+              </span>
+            )}
           </Link>
           {isAuthenticated ? (
             <button

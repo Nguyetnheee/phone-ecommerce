@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Product } from '../../types/Product';
+import { useCartContext } from '../../context/CartContext';
+import Button from './Button';
 
 interface ProductCardProps {
   product: Product;
@@ -11,7 +13,15 @@ const currencyFormatter = new Intl.NumberFormat('vi-VN', {
 });
 
 function ProductCard({ product }: ProductCardProps) {
+  const { addItem } = useCartContext();
+
   const isInStock = product.stockQuantity > 0;
+
+  const handleAddToCart = () => {
+    console.log('[ProductCard] Adding to cart:', product);
+    addItem(product);
+    console.log('[ProductCard] Item added to cart');
+  };
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
@@ -65,9 +75,13 @@ function ProductCard({ product }: ProductCardProps) {
           {isInStock ? `In stock: ${product.stockQuantity}` : 'Out of stock'}
         </p>
 
+        <Button type="button" className="mt-4 w-full" onClick={handleAddToCart}>
+          Thêm vào giỏ
+        </Button>
+
         <Link
           to={`/products/${product.id}`}
-          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+          className="mt-2 inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-600 hover:text-blue-600"
         >
           View detail
         </Link>
