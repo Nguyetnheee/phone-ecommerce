@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.phoneecommerce.backend.dto.ProductResponse;
+import com.phoneecommerce.backend.dto.response.ProductResponse;
 import com.phoneecommerce.backend.service.ProductService;
 
 @RestController
