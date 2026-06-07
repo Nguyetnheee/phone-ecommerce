@@ -1,12 +1,9 @@
 /**
- * Auth Service (Placeholder)
+ * Auth Service - Backend Integration
  * 
- * TODO: Connect to backend auth API when BE-009/BE-010 are ready
- * - BE-009: User registration endpoint
- * - BE-010: User login endpoint
- * 
- * IMPORTANT: This service does NOT make real API calls yet.
- * It serves as a structure placeholder for UI integration testing.
+ * Handles authentication with real backend APIs
+ * - Register: POST /api/auth/register
+ * - Login: POST /api/auth/login
  */
 
 // Types for auth payloads
@@ -25,146 +22,180 @@ export interface RegisterPayload {
 export interface AuthResponse {
   success: boolean;
   message: string;
-  // token will be added when backend is ready
-  // DO NOT hardcode or fake a production token
+  token?: string | null;
+  user?: {
+    email?: string;
+    role?: string;
+  };
 }
 
-// Mock response delay for UI testing
-const MOCK_DELAY_MS = 1000;
+// API base URL
+const API_BASE = 'http://localhost:8080/api/auth';
+
+// localStorage keys
+const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
+
+
+
+/**
+ * Get stored authentication token
+ */
+export function getToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch (error) {
+    console.error('[Auth] Error retrieving token:', error);
+    return null;
+  }
+}
+
+/**
+ * Store user data
+ */
+function storeUser(user: { email: string; role: string }): void {
+  try {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } catch (error) {
+    console.error('[Auth] Error storing user:', error);
+  }
+}
+
+/**
+ * Get stored user data
+ */
+export function getUser(): { email: string; role: string } | null {
+  try {
+    const user = localStorage.getItem(USER_KEY);
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.error('[Auth] Error retrieving user:', error);
+    return null;
+  }
+}
 
 /**
  * Login function
  * 
- * Placeholder implementation for UI testing.
- * Backend endpoint needed: POST /api/auth/login
- * Expected request: { email: string, password: string }
- * Expected response: { token: string, user: { id, email, name } }
+ * Calls POST /api/auth/login with email and password
+ * Backend returns: { email, token: null, role }
  */
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
-  // Simulate network delay for UI testing
-  await new Promise(resolve => setTimeout(resolve, MOCK_DELAY_MS));
+  try {
+    console.log('[Auth] Login attempt');
 
-  // Validate payload
-  if (!payload.email || !payload.password) {
-    return {
-      success: false,
-      message: 'Email and password are required',
-    };
-  }
+    const response = await fetch(`${API_BASE}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: payload.email,
+        password: payload.password,
+      }),
+    });
 
-  // TODO: Remove this mock logic and replace with real API call
-  // Example of what the real implementation should look like:
-  // const response = await fetch('/api/auth/login', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(payload),
-  // });
-  // const data = await response.json();
-  // if (data.token) {
-  //   localStorage.setItem('token', data.token); // Only when API is confirmed
-  // }
+    const data = await response.json();
 
-  // Mock validation for UI testing only
-  if (payload.email === 'demo@gmail.com' && payload.password === 'demo123') {
-    console.log('[AUTH SERVICE] Mock login successful - REMOVE THIS IN PRODUCTION');
+    if (!response.ok) {
+      console.warn('[Auth] Login failed');
+      return {
+        success: false,
+        message: data.message || 'Login failed. Please check your email and password.',
+      };
+    }
+
+    console.log('[Auth] Login successful');
+
+    // Store minimal user info (email and role)
+    if (data.email && data.role) {
+      storeUser({ email: data.email, role: data.role });
+    }
+
     return {
       success: true,
-      message: 'Login successful',
-      // DO NOT return fake token - wait for real backend
+      message: data.message || 'Login successful',
+      token: data.token,
+      user: { email: data.email, role: data.role },
+    };
+  } catch (error) {
+    console.error('[Auth] Login error');
+    return {
+      success: false,
+      message: 'Network error. Please check your connection.',
     };
   }
-
-  return {
-    success: false,
-    message: 'Invalid email or password',
-  };
 }
 
 /**
  * Register function
  * 
- * Placeholder implementation for UI testing.
- * Backend endpoint needed: POST /api/auth/register
- * Expected request: { name, email, password }
- * Expected response: { message: string, user: { id, email, name } }
+ * Calls POST /api/auth/register with fullName, email, password
+ * Frontend collects name, email, password, confirmPassword
+ * We only send fullName, email, password to backend
  */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
-  // Simulate network delay for UI testing
-  await new Promise(resolve => setTimeout(resolve, MOCK_DELAY_MS));
+  try {
+    console.log('[Auth] Register attempt');
 
-  // Validate payload
-  if (!payload.name || !payload.email || !payload.password || !payload.confirmPassword) {
+    const response = await fetch(`${API_BASE}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fullname: payload.name, // Map frontend 'name' to backend 'fullname' (all lowercase)
+        email: payload.email,
+        password: payload.password,
+        // Do NOT send confirmPassword to backend
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.warn('[Auth] Register failed');
+      return {
+        success: false,
+        message: data.message || 'Registration failed. Please try again.',
+      };
+    }
+
+    console.log('[Auth] Registration successful');
+
+    return {
+      success: true,
+      message: data.message || 'Registration successful. Please login with your credentials.',
+      user: data,
+    };
+  } catch (error) {
+    console.error('[Auth] Register error:', error);
     return {
       success: false,
-      message: 'All fields are required',
+      message: 'Network error. Please check your connection.',
     };
   }
-
-  if (payload.password !== payload.confirmPassword) {
-    return {
-      success: false,
-      message: 'Passwords do not match',
-    };
-  }
-
-  // TODO: Remove this mock logic and replace with real API call
-  // Example of what the real implementation should look like:
-  // const response = await fetch('/api/auth/register', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({
-  //     name: payload.name,
-  //     email: payload.email,
-  //     password: payload.password,
-  //   }),
-  // });
-  // return await response.json();
-
-  // Mock registration for UI testing only
-  console.log('[AUTH SERVICE] Mock registration - REMOVE THIS IN PRODUCTION');
-  return {
-    success: true,
-    message: 'Registration successful. Please login with your credentials.',
-  };
 }
 
 /**
  * Logout function
  * 
- * Clears local auth state.
- * Will be enhanced when token-based auth is implemented.
+ * Clears authentication data from localStorage
  */
 export function logout(): void {
-  // TODO: Add logout API call when backend is ready
-  // Example:
-  // await fetch('/api/auth/logout', { method: 'POST' });
-
-  // Clear mock data (no sensitive data stored yet)
-  console.log('[AUTH SERVICE] Logout - no session to clear yet');
-
-  // When token-based auth is implemented:
-  // localStorage.removeItem('token');
-  // localStorage.removeItem('user');
+  console.log('[Auth] Logout');
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    console.log('[Auth] Auth data cleared');
+  } catch (error) {
+    console.error('[Auth] Error during logout:', error);
+  }
 }
 
 /**
  * Check if user is authenticated
- * 
- * Placeholder for future token validation.
  */
 export function isAuthenticated(): boolean {
-  // TODO: Implement when token-based auth is ready
-  // return !!localStorage.getItem('token');
-  return false;
-}
-
-/**
- * Get current user
- * 
- * Placeholder for future user data retrieval.
- */
-export function getCurrentUser(): null {
-  // TODO: Implement when token-based auth is ready
-  // return JSON.parse(localStorage.getItem('user') || 'null');
-  return null;
+  return !!getToken();
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/authService';
-import Button from '../../components/ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface FormErrors {
   email?: string;
@@ -11,6 +11,7 @@ interface FormErrors {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { setAuthUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
@@ -69,8 +70,11 @@ function LoginPage() {
         // Clear form
         setEmail('');
         setPassword('');
-        // TODO: Redirect to dashboard or home when auth context is ready
-        // For now, just show success message for 2 seconds
+        // Update auth context with user data
+        if (response.user) {
+          setAuthUser(response.user as { email: string; role: string });
+        }
+        // Redirect to home
         setTimeout(() => {
           navigate('/');
         }, 2000);

@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/';
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:px-8">
@@ -10,7 +18,16 @@ function Navbar() {
           </Link>
           <div className="flex items-center gap-3 text-sm font-medium text-slate-700 lg:hidden">
             <Link to="/">Giỏ hàng</Link>
-            <Link to="/login">Tài khoản</Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="hover:text-blue-600 cursor-pointer bg-none border-none p-0"
+              >
+                Đăng xuất
+              </button>
+            ) : (
+              <Link to="/login">Tài khoản</Link>
+            )}
           </div>
         </div>
 
@@ -31,9 +48,18 @@ function Navbar() {
           <Link to="/" className="hidden hover:text-blue-600 lg:inline">
             Giỏ hàng
           </Link>
-          <Link to="/login" className="hidden hover:text-blue-600 lg:inline">
-            Tài khoản
-          </Link>
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="hidden hover:text-blue-600 lg:inline bg-none border-none p-0 cursor-pointer text-slate-700 font-medium"
+            >
+              Đăng xuất
+            </button>
+          ) : (
+            <Link to="/login" className="hidden hover:text-blue-600 lg:inline">
+              Tài khoản
+            </Link>
+          )}
         </nav>
       </div>
     </header>
