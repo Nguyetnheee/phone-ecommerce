@@ -125,52 +125,61 @@ function CartPage() {
                     </div>
 
                     {/* Quantity Controls and Remove */}
-                    <div className="mt-4 flex items-center justify-between gap-4">
-                      {/* Quantity Control */}
-                      <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 p-1">
+                    <div className="mt-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        {/* Quantity Control */}
+                        <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 p-1">
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(item.productId, item.quantity - 1)
+                            }
+                            className="h-8 w-8 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-colors rounded"
+                            aria-label="Decrease quantity"
+                            disabled={item.quantity <= 1}
+                          >
+                            −
+                          </button>
+                          <span className="w-8 text-center font-semibold text-slate-900">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(item.productId, item.quantity + 1)
+                            }
+                            className="h-8 w-8 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-colors rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Increase quantity"
+                            disabled={item.quantity >= item.stock}
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        {/* Remove Button */}
                         <button
-                          onClick={() =>
-                            handleQuantityChange(item.productId, item.quantity - 1)
-                          }
-                          className="h-8 w-8 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-colors rounded"
-                          aria-label="Decrease quantity"
+                          onClick={() => handleRemoveItem(item.productId)}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
                         >
-                          −
-                        </button>
-                        <span className="w-8 text-center font-semibold text-slate-900">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(item.productId, item.quantity + 1)
-                          }
-                          className="h-8 w-8 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white transition-colors rounded"
-                          aria-label="Increase quantity"
-                        >
-                          +
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                          Xóa
                         </button>
                       </div>
 
-                      {/* Remove Button */}
-                      <button
-                        onClick={() => handleRemoveItem(item.productId)}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors"
-                      >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                        Xóa
-                      </button>
+                      {/* Stock Info */}
+                      <p className="text-xs text-slate-600">
+                        Tồn kho: <span className="font-semibold text-slate-900">{item.stock}</span> sản phẩm
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -225,13 +234,11 @@ function CartPage() {
               </div>
 
               {/* Checkout Button */}
-              <button
-                disabled
-                className="mt-6 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-semibold text-white bg-slate-400 cursor-not-allowed opacity-60"
-                title="Checkout sẽ được thêm khi BE-013 sẵn sàng"
-              >
-                Thanh toán (Sắp có)
-              </button>
+              <div className="mt-6">
+                <Link to="/checkout">
+                  <Button type="button">Thanh toán</Button>
+                </Link>
+              </div>
 
               {/* Info Text */}
               <p className="mt-4 text-xs text-slate-500 text-center">

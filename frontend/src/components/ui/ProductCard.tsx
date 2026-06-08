@@ -14,10 +14,15 @@ const currencyFormatter = new Intl.NumberFormat('vi-VN', {
 
 function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCartContext();
+  const isOutOfStock = product.stockQuantity <= 0;
 
   const isInStock = product.stockQuantity > 0;
 
   const handleAddToCart = () => {
+    if (isOutOfStock) {
+      console.log('[ProductCard] Cannot add - product out of stock');
+      return;
+    }
     console.log('[ProductCard] Adding to cart:', product);
     addItem(product);
     console.log('[ProductCard] Item added to cart');
@@ -41,6 +46,14 @@ function ProductCard({ product }: ProductCardProps) {
         <span className="absolute left-3 top-3 rounded bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white">
           {product.brand}
         </span>
+
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <span className="rounded bg-red-600 px-3 py-2 text-sm font-semibold text-white">
+              Hết hàng
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
@@ -75,7 +88,12 @@ function ProductCard({ product }: ProductCardProps) {
           {isInStock ? `In stock: ${product.stockQuantity}` : 'Out of stock'}
         </p>
 
-        <Button type="button" className="mt-4 w-full" onClick={handleAddToCart}>
+        <Button
+          type="button"
+          className="mt-4 w-full"
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
+        >
           Thêm vào giỏ
         </Button>
 
