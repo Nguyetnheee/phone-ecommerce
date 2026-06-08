@@ -1,4 +1,4 @@
-package com.phoneecommerce.backend.dto;
+package com.phoneecommerce.backend.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,6 +1,16 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCartContext } from '../../context/CartContext';
 
 function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+  const { totalItems } = useCartContext();
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/';
+  };
+
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:px-8">
@@ -9,8 +19,24 @@ function Navbar() {
             PhoneStore
           </Link>
           <div className="flex items-center gap-3 text-sm font-medium text-slate-700 lg:hidden">
-            <Link to="/">Giỏ hàng</Link>
-            <Link to="/">Tài khoản</Link>
+            <Link to="/cart" className="relative">
+              Giỏ hàng
+              {totalItems > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="hover:text-blue-600 cursor-pointer bg-none border-none p-0"
+              >
+                Đăng xuất
+              </button>
+            ) : (
+              <Link to="/login">Tài khoản</Link>
+            )}
           </div>
         </div>
 
@@ -22,18 +48,32 @@ function Navbar() {
           <Link to="/" className="hover:text-blue-600">
             Trang chủ
           </Link>
-          <Link to="/" className="hover:text-blue-600">
+          <Link to="/products" className="hover:text-blue-600">
             Sản phẩm
           </Link>
           <Link to="/" className="hover:text-blue-600">
             Khuyến mãi
           </Link>
-          <Link to="/" className="hidden hover:text-blue-600 lg:inline">
+          <Link to="/cart" className="hidden hover:text-blue-600 lg:inline relative">
             Giỏ hàng
+            {totalItems > 0 && (
+              <span className="absolute -right-3 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs font-bold text-white">
+                {totalItems}
+              </span>
+            )}
           </Link>
-          <Link to="/" className="hidden hover:text-blue-600 lg:inline">
-            Tài khoản
-          </Link>
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="hidden hover:text-blue-600 lg:inline bg-none border-none p-0 cursor-pointer text-slate-700 font-medium"
+            >
+              Đăng xuất
+            </button>
+          ) : (
+            <Link to="/login" className="hidden hover:text-blue-600 lg:inline">
+              Tài khoản
+            </Link>
+          )}
         </nav>
       </div>
     </header>

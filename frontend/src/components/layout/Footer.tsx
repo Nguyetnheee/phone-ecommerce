@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-slate-950 text-slate-300">
@@ -16,9 +18,21 @@ function Footer() {
         <div>
           <h3 className="font-semibold text-white">Chính sách</h3>
           <ul className="mt-3 space-y-2 text-sm">
-            <li>Chính sách bảo hành</li>
-            <li>Chính sách đổi trả</li>
-            <li>Điều khoản mua hàng</li>
+            <li>
+              <Link to="/return-warranty" className="hover:text-white">
+                Chính sách đổi trả & bảo hành
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms-of-use" className="hover:text-white">
+                Điều khoản sử dụng
+              </Link>
+            </li>
+            <li>
+              <Link to="/privacy-policy" className="hover:text-white">
+                Chính sách bảo mật
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.phoneecommerce.backend.dto.ProductResponse;
+import com.phoneecommerce.backend.dto.response.ProductResponse;
 import com.phoneecommerce.backend.entity.Product;
 import com.phoneecommerce.backend.mapper.ProductMapper;
 import com.phoneecommerce.backend.repository.ProductRepository;

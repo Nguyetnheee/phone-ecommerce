@@ -1,6 +1,8 @@
+import { useEffect, useMemo, useState } from 'react';
 import Button from '../../components/ui/Button';
 import ProductCard from '../../components/ui/ProductCard';
-import { mockProducts } from '../../constants/mockProducts';
+import { getAllProducts } from '../../services/product.service';
+import type { Product } from '../../types/Product';
 
 const categories = ['iPhone', 'Samsung', 'Xiaomi', 'OPPO', 'Điện thoại gaming', 'Phụ kiện'];
 
@@ -12,6 +14,27 @@ const policies = [
 ];
 
 function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const productList = await getAllProducts();
+        setProducts(productList);
+      } catch {
+        setErrorMessage('Không thể tải sản phẩm. Vui lòng kiểm tra backend đang chạy.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
+  const featuredProducts = useMemo(() => products.slice(0, 4), [products]);
+
   return (
     <div>
       <section className="bg-white">
@@ -91,11 +114,32 @@ function HomePage() {
             Featured products
           </h2>
         </div>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {mockProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {isLoading ? (
+          <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+            Đang tải sản phẩm từ database...
+          </div>
+        ) : null}
+
+        {!isLoading && errorMessage ? (
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-8 text-center text-red-700">
+            {errorMessage}
+          </div>
+        ) : null}
+
+        {!isLoading && !errorMessage && featuredProducts.length === 0 ? (
+          <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+            Chưa có sản phẩm nào trong database.
+          </div>
+        ) : null}
+
+        {!isLoading && !errorMessage && featuredProducts.length > 0 ? (
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <section className="bg-white">
