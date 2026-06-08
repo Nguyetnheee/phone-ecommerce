@@ -10,7 +10,8 @@ import ReturnWarrantyPolicyPage from '../pages/policy/ReturnWarrantyPolicyPage';
 import TermsOfUsePage from '../pages/terms/TermsOfUsePage';
 import CartPage from '../pages/cart/CartPage';
 import CheckoutPage from '../pages/checkout/CheckoutPage';
-import OrderSuccessPage from '../pages/checkout/OrderSuccessPage';
+import OrderSuccessPage from '../pages/order/OrderSuccessPage';
+import OrderTrackingPage from '../pages/order/OrderTrackingPage';
 
 function AppRoutes() {
   return (
@@ -79,6 +80,11 @@ function AppRoutes() {
           </MainLayout>
         }
       />
+      <Route path="/orders/:orderId" element={
+        <MainLayout>
+          <OrderTrackingPage />
+        </MainLayout>
+      } />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route
